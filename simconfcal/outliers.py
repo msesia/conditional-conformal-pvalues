@@ -2,6 +2,7 @@ import numpy as np
 import copy
 from sklearn.model_selection import train_test_split
 from .utils_calib import betainv_simes
+from .utils_calib import compute_aseq, cdf_bound
 from .utils_calib import find_slope_EB
 
 def calibrate_simultaneous(pval, n_cal, delta=0.01, method="Simes", simes_kden=3, a=None, two_sided=False):
@@ -60,3 +61,23 @@ class ConformalOutlierDetector:
         output = {"Simes" : pvals_simes, "Pointwise" : pvals}
 
         return output
+
+
+class CDFConfidenceBand:
+    def __init__(self, x, delta=0.1):
+        self.n = len(x)
+        self.delta = delta
+        self.x_cal = np.sort(x)
+        ## Sequence of a values for upper limit
+        k = int(self.n/2)
+        self.aseq_upper = compute_aseq(self.n, k, self.delta) 
+        ## Sequence of a values for lower limit
+        k = 10
+        self.aseq_lower = compute_aseq(self.n, k, self.delta)
+
+    def evaluate(self, x):
+        x = np.sort(x)
+        upper = cdf_bound(x, self.x_cal, self.aseq_upper)
+        lower = 1 - cdf_bound(np.sort(-x), np.sort(-self.x_cal), self.aseq_lower)
+        lower = np.sort(lower)
+        return lower, upper, x

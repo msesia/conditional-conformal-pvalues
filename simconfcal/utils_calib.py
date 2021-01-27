@@ -6,8 +6,7 @@ def betainv_generic(pvals, aseq):
     out = 1 - aseq[idx-1]
     return out
 
-def betainv_simes(pvals, n, k, delta):
-
+def compute_aseq(n, k, delta):
     def movingaverage (values, window):
         weights = np.repeat(1.0, window)/window
         sma = np.convolve(values, weights, 'valid')
@@ -17,8 +16,19 @@ def betainv_simes(pvals, n, k, delta):
     fac1 = np.log(delta) / k - np.mean(np.log(np.arange(n-k+1,n+1)))
     fac2 = movingaverage(np.log(np.arange(1,n+1)), k)
     aseq = np.concatenate([np.zeros((k-1,)), np.exp(fac2 + fac1)])
+    return aseq
+
+def betainv_simes(pvals, n, k, delta):
+    aseq = compute_aseq(n, k, delta)
     out = betainv_generic(pvals, aseq)
     return out
+
+def cdf_bound(x, x_cal, aseq):
+    n_cal = len(x_cal)
+    x = np.reshape(np.array(x), [len(x),1])
+    jseq = np.maximum(0, np.sum(x > x_cal, 1)-1)
+    g_hat = 1-aseq[n_cal-1-jseq]
+    return g_hat
 
 # Empirical bound
 def find_slope_EB(n, alpha=None, prob=0.9, n_sim=5000):
