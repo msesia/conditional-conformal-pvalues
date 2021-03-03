@@ -2,8 +2,8 @@ import numpy as np
 import sys
 from scipy import interpolate
 from statsmodels.distributions.empirical_distribution import ECDF
-from simconfcal.utils_quantile import QNet, QRF
-from simconfcal.utils_density import QDensity
+from scpv.utils_quantile import QNet, QRF
+from scpv.utils_density import QDensity
 
 import pdb
 

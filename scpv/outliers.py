@@ -63,7 +63,7 @@ class ConformalOutlierDetector:
         return output
 
 
-class CDFConfidenceBand:
+class CalibrationBound:
     def __init__(self, x, delta=0.1):
         self.n = len(x)
         self.delta = delta
@@ -71,13 +71,8 @@ class CDFConfidenceBand:
         ## Sequence of a values for upper limit
         k = int(self.n/2)
         self.aseq_upper = compute_aseq(self.n, k, self.delta) 
-        ## Sequence of a values for lower limit
-        k = 10
-        self.aseq_lower = compute_aseq(self.n, k, self.delta)
 
     def evaluate(self, x):
         x = np.sort(x)
-        upper = cdf_bound(x, self.x_cal, self.aseq_upper)
-        lower = 1 - cdf_bound(np.sort(-x), np.sort(-self.x_cal), self.aseq_lower)
-        lower = np.sort(lower)
-        return lower, upper, x
+        bound = cdf_bound(x, self.x_cal, self.aseq_upper)
+        return bound, x
