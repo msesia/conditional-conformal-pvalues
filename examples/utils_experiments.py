@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from scpv.methods import calibrate_ccv
+from cccpv.methods import calibrate_ccv
 from statsmodels.stats.multitest import multipletests
 import copy
 
