@@ -1,4 +1,4 @@
-# Conditional calibration of conformal p-values
+# Conditional Calibration of Conformal P-Values
 
 We study the construction of p-values for nonparametric outlier detection, taking a multiple-testing perspective.  The framework is that of conformal prediction, which wraps around any machine-learning algorithm to provide finite-sample guarantees regarding the validity of predictions for future testpoints.  In this setting, existing methods can compute p-values that are marginally valid but mutually dependent for different future test points. 
 
