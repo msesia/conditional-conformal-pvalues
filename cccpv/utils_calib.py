@@ -1,5 +1,69 @@
 import numpy as np
 
+def compute_cn(delta,n):
+    cn = -np.log(-np.log(1-delta)) + 2*np.log(np.log(n)) + 0.5 * np.log(np.log(np.log(n))) - 0.5 * np.log(np.pi)
+    cn /= np.sqrt(2*np.log(np.log(n)))
+    return cn
+
+def compute_hybrid_bound(delta,n,gamma):
+    i = np.arange(1,n+1)
+    cna = compute_cn(delta-gamma,n)
+    bound = i/n + cna * np.sqrt(i*(n-i))/(n*np.sqrt(n))
+    k_linear = int(n/2)
+    slope = (bound[k_linear-1]-bound[k_linear-2])
+    bound[k_linear:] = bound[k_linear-1] + slope * (i[k_linear:]-k_linear)
+    k_simes = int(n/2)
+    bound_s = 1.0-compute_aseq(n, k_simes, delta)[::-1]
+    bound_h = np.minimum(bound_s, bound)
+    return bound_h
+
+def estimate_fs_correction(delta,n):
+    n_mc = 10000
+    U = np.random.uniform(size=(n_mc,n))
+    U = np.sort(U,axis=1)
+    cna = compute_cn(delta,n)
+    i = np.arange(1,n+1)
+    bound_a = i/n + cna * np.sqrt(i*(n-i))/(n*np.sqrt(n))
+    k_simes = int(n/2)
+    bound_s = 1.0-compute_aseq(n, k_simes, delta)[::-1]
+    def estimate_prob_crossing(gamma):
+        bound = compute_hybrid_bound(delta,n,gamma)
+        crossings = np.sum(U>bound,1)
+        prob_crossing = np.mean(crossings>0)
+        return prob_crossing
+    # Binary search
+    gamma0 = -(1-1e-6-delta)
+    f0 = estimate_prob_crossing(gamma0)
+    gamma1 = delta-1e-6
+    f1 = estimate_prob_crossing(gamma1)
+    while np.abs(gamma1-gamma0) > 1e-6:
+        gamma = (gamma0 + gamma1)/2
+        f = estimate_prob_crossing(gamma)
+        if f>delta:
+            gamma0 = gamma
+            f0 = f
+        else:
+            gamma1 = gamma
+            f1 = f
+    return gamma
+
+def betainv_mc(pvals, n, delta, fs_correction=1):
+    iseq = np.arange(1,n+1)
+    cn = compute_cn(delta, n)
+    bound = compute_hybrid_bound(delta,n,fs_correction)
+    aseq = 1 - np.minimum(1, bound[::-1])
+    out = betainv_generic(pvals, aseq)
+    return out
+
+def betainv_asymptotic(pvals, n, k, delta):
+    k = int(k)
+    iseq = np.arange(1,n+1)
+    cn = compute_cn(delta, n)
+    aseq = iseq / n + cn * np.sqrt(iseq*(n-iseq)) / (n*np.sqrt(n))
+    aseq = 1 - np.minimum(1, aseq[::-1])
+    out = betainv_generic(pvals, aseq)
+    return out
+
 def betainv_generic(pvals, aseq):
     n = len(aseq)
     idx = np.maximum(1, np.floor((n + 1) * (1 - pvals))).astype(int)

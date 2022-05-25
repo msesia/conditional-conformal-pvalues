@@ -24,9 +24,15 @@ class ConformalOutlierDetector:
         
         pvals = self.oneclass.get_pval(X_test)
         pvals_simes = calibrate_ccv(pvals, self.n_cal, delta=delta, method="Simes", simes_kden=simes_kden)
+        pvals_mc = calibrate_ccv(pvals, self.n_cal, delta=delta, method="MC", fs_correction=fs_correction)
+        pvals_as = calibrate_ccv(pvals, self.n_cal, delta=delta, method="Asymptotic")
+        pvals_dkwm = calibrate_ccv(pvals, self.n_cal, delta=delta, method="DKWM", simes_kden=simes_kden)
 
         # Collect results
         output = pd.DataFrame({"Simes " + self.box_name : pvals_simes,
+                               "Monte Carlo" + self.box_name : pvals_mc,
+                               "Asymptotic" + self.box_name : pvals_as,
+                               "DKWM" + self.box_name : pvals_dkwm,
                                "Pointwise " + self.box_name : pvals})
 
         return output
