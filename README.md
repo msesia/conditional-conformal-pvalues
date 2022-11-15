@@ -6,6 +6,7 @@ This repository contains a software implementation and guided examples for the m
   ```
   "Testing for Outliers with Conformal p-values"
   Stephen Bates, Emmanuel Candes, Lihua Lei, Yaniv Romano, and Matteo Sesia. 
-  arXiv preprint (2021) https://arxiv.org/abs/2104.08279
+  accepted in Annals of Statistics (2022)
+  arXiv pre-print: https://arxiv.org/abs/2104.08279
   ```
   
